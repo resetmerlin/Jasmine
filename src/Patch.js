@@ -21,9 +21,12 @@ export const patch = (oldNode, newNode) => {
     }
   }
 
-  for (let i = 0; i < oldNode.childNodes.length; i++) {
-    patch(oldNode.childNodes[i], newNode.children[i]);
-  }
+  if (oldNode.childNodes.length !== renderedNewNode.childNodes.length) {
+    oldNode.parentNode.replaceChild(renderedNewNode, oldNode);
+  } else
+    for (let i = 0; i < oldNode.childNodes.length; i++) {
+      patch(oldNode.childNodes[i], newNode.children[i]);
+    }
 
   return;
 };
