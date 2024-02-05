@@ -1,24 +1,29 @@
-export const patch = (container, oldNode, newNode) => {
-  if (!oldNode) {
-    container.appendChild(render(newNode));
+import { render } from "./Render";
+
+export const patch = (oldNode, newNode) => {
+  if (!newNode) return;
+
+  const renderedNewNode = render(newNode);
+
+  if (oldNode.isEqualNode(renderedNewNode)) return;
+
+  if (oldNode.nodeName !== renderedNewNode.nodeName) {
+    oldNode.parentNode.replaceChild(renderedNewNode, oldNode);
   }
 
-  if (!newNode) {
-    container.removeChild(render(oldNode).firstChild);
-  }
-
-  if (oldNode.type !== newNode.type) {
-    container.replaceChild(render(newNode), container.firstChild);
-  }
-
-  if (typeof oldNode !== "string" && typeof newNode !== "string")
-    for (const [key, value] of Object.entries(oldNode.attr)) {
-      if (newNode.attr[key] !== value)
-        container.replaceChild(render(newNode), container.firstChild);
+  if (
+    oldNode &&
+    renderedNewNode &&
+    oldNode.attributes !== renderedNewNode.attributes
+  ) {
+    for (const attr of renderedNewNode.attributes) {
+      oldNode.setAttribute(attr.name, attr.value);
     }
+  }
 
-  if (oldNode.children)
-    for (let i = 0; i < oldNode.children.length; i++) {
-      patch(container.firstChild, oldNode.children[i], newNode.children[i]);
-    }
+  for (let i = 0; i < oldNode.childNodes.length; i++) {
+    patch(oldNode.childNodes[i], newNode.children[i]);
+  }
+
+  return;
 };
