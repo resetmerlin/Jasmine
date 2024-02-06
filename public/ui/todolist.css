@@ -1,0 +1,30 @@
+.todolist {
+  display: flex;
+  width: 93%;
+  height: 5rem;
+  border-radius: 0.3rem;
+  padding: 0.5rem;
+  background-color: white;
+  margin: 1rem 0;
+  justify-content: space-between;
+}
+.todolist div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  width: auto;
+  margin: 0 0.9rem;
+  height: 100%;
+}
+.todolist input {
+  border: none;
+}
+.todolist .title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: black;
+}
+.todolist .subtitle {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.8);
+}

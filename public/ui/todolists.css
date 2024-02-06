@@ -1,0 +1,25 @@
+.todolists__wrapper {
+  width: 55rem;
+  min-height: 35rem;
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+}
+.todolists__wrapper .todolists__title {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 600;
+}
+.todolists__wrapper .todolists__content {
+  border-radius: 0.7rem;
+  width: 55rem;
+  padding: 0.5rem;
+  height: auto;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
