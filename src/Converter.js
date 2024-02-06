@@ -1,13 +1,7 @@
 import { createElement } from "./CreateElement";
 
-export function convertHTMLToCreateElement(htmlString) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlString, "text/html");
-  return convertNodeToCreateElement(doc.body.firstChild);
-}
-
 // Recursive function to convert a node to createElement syntax
-function convertNodeToCreateElement(node) {
+const convertNodeToCreateElement = (node) => {
   if (node.nodeType === Node.TEXT_NODE) {
     return node.textContent;
   }
@@ -17,4 +11,10 @@ function convertNodeToCreateElement(node) {
   const children = Array.from(node.childNodes).map(convertNodeToCreateElement);
 
   return createElement(tag, props, ...children);
-}
+};
+
+export const convertHTMLToCreateElement = (htmlString) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, "text/html");
+  return convertNodeToCreateElement(doc.body.firstChild);
+};
