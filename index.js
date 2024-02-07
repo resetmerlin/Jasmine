@@ -16,9 +16,7 @@ const htmlString = `
   </div>
 </div>;`;
 
-console.log(htmlString.trim());
-
-const vDom = convertHTMLToCreateElement(htmlString.trim());
+const vDom = convertHTMLToCreateElement(htmlString);
 
 init(document.getElementById("app"), render(vDom), vDom);
 
@@ -35,13 +33,6 @@ function renderTodoList() {
       todoListView(todoList.title, todoList.subtitle, todoList.order)
     )
     .join("");
-
-  patch(
-    document.getElementById(
-      "app",
-      convertHTMLToCreateElement($todoListContent.outerHTML)
-    )
-  );
 
   todoLists.forEach((todoList) => {
     const form = document.querySelector(`#form-${todoList.order}`);
@@ -94,7 +85,6 @@ function editTodoList(event, order) {
 }
 
 function todoListView(title, subtitle, order) {
-  // Note: Removed deleteTodoList argument since it's not directly used here
   return `
     <form id="form-${order}" class="todolist">
         <div>
