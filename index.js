@@ -1,115 +1,104 @@
+import Jasmine from "./core/Jasmine";
 import { convertHTMLToCreateElement } from "./src/Converter";
-import { init } from "./src/Init";
-import { patch } from "./src/Patch";
-import { render } from "./src/Render";
 
-const htmlString = `
-<div class="container">
-  <div class="todolists__wrapper">
-    <div class="todolists__title">
-      <h2>TODO LIST</h2>
+class App {
+  constructor(app) {
+    this.$app = app;
+    this.setup();
+    this.addEvents();
+    this.todoLists = [];
+    this.vDom;
+  }
+
+  template(children = "") {
+    return `<div class="container">
+    <div class="todolists__wrapper">
+      <div class="todolists__title">
+        <h2>TODO LIST</h2>
+      </div>
+      <button class="button" type="button" id="add__button">
+        Add
+      </button>
+      <div class="todolists__content">${children}</div>
     </div>
-    <button class="button" type="button" id="add__button">
-      Add
-    </button>
-    <div class="todolists__content"></div>
-  </div>
-</div>;`;
+  </div>`;
+  }
 
-const vDom = convertHTMLToCreateElement(htmlString);
+  setup() {
+    const domObj = convertHTMLToCreateElement(this.template());
+    this.vDom = Jasmine.render(domObj);
+    Jasmine.init(this.$app, this.vDom, domObj);
+  }
 
-init(document.getElementById("app"), render(vDom), vDom);
+  render(newVDom) {
+    Jasmine.patch(this.vDom, newVDom);
+    this.vDom = Jasmine.render(newVDom);
+  }
 
-const $addTodoListButton = document.querySelector("#add__button");
-const $todoListContent = document.querySelector(".todolists__content");
+  addEvents() {
+    const $addTodoListButton = document.querySelector("#add__button");
+    $addTodoListButton.addEventListener("click", () => this.addTodoList());
+  }
 
-$addTodoListButton.addEventListener("click", addTodoList);
+  addTodoList() {
+    const dummyData = {
+      order: this.todoLists?.length
+        ? this.todoLists[this.todoLists.length - 1].order + 1
+        : 0,
+      title: "You can delete it",
+      subtitle: "Edit via delete button",
+    };
 
-let todoLists = [];
+    this.todoLists = [...this.todoLists, dummyData];
 
-function renderTodoList() {
-  $todoListContent.innerHTML = todoLists
-    .map((todoList) =>
-      todoListView(todoList.title, todoList.subtitle, todoList.order)
-    )
-    .join("");
-
-  todoLists.forEach((todoList) => {
-    const form = document.querySelector(`#form-${todoList.order}`);
-    form.addEventListener("submit", (e) => editTodoList(e, todoList.order));
-
-    const deleteButton = document.querySelector(`#delete-${todoList.order}`);
-    deleteButton.addEventListener("click", () =>
-      deleteTodoList(todoList.order)
+    const renderedTemplate = this.template(
+      this.todoLists
+        .map((todolist) =>
+          this.todoListView(todolist.title, todolist.subtitle, todolist.order)
+        )
+        .join("")
     );
-  });
+
+    const newVDom = convertHTMLToCreateElement(renderedTemplate);
+
+    this.render(newVDom);
+  }
+
+  deleteTodoList(order) {
+    this.todoLists = [...this.todoLists].filter(
+      (todoList) => order !== todoList.order
+    );
+  }
+
+  todoListView(title, subtitle, order) {
+    return `
+      <form id="form-${order}" class="todolist">
+          <div>
+            <label class="checkbox path">
+                <input type="checkbox" />
+                <svg viewBox="0 0 21 21">
+                    <path d="M5,10.75 L8.5,14.25 L19.4,2.3 C18.8333333,1.43333333 18.0333333,1 17,1 L4,1 C2.35,1 1,2.35 1,4 L1,17 C1,18.65 2.35,20 4,20 L17,20 C18.65,20 20,18.65 20,17 L20,7.99769186" />
+                </svg>
+            </label>
+          </div>
+          <div>
+                <input
+                    class="title"
+                    placeholder=${title}
+                    id="title"
+                    name="title" 
+                />
+                <input
+                    class="subtitle"
+                    placeholder=${subtitle}
+                    id="subtitle"
+                    name="subtitle" 
+                />
+        </div>    
+          <button type="submit" class='button'>Edit</button>
+          <button type="button" id="delete-${order}" class='button'>Delete</button>
+      </form>`;
+  }
 }
 
-function addTodoList() {
-  const dummyData = {
-    order: todoLists?.length ? todoLists[todoLists.length - 1].order + 1 : 0,
-    title: "You can delete it",
-    subtitle: "Edit via delete button",
-  };
-
-  todoLists = [...todoLists, dummyData];
-
-  renderTodoList();
-}
-
-function deleteTodoList(order) {
-  todoLists = [...todoLists].filter((todoList) => order !== todoList.order);
-
-  renderTodoList();
-}
-
-function editTodoList(event, order) {
-  event.preventDefault();
-
-  const data = new FormData(event.target);
-  const dataObject = Object.fromEntries(data.entries());
-
-  const title = dataObject.title;
-  const subtitle = dataObject.subtitle;
-
-  if (!title && !subtitle) return;
-
-  todoLists = todoLists.map((todoList) => {
-    if (todoList.order === order) {
-      return { ...todoList, title, subtitle };
-    }
-    return todoList;
-  });
-
-  renderTodoList();
-}
-
-function todoListView(title, subtitle, order) {
-  return `
-    <form id="form-${order}" class="todolist">
-        <div>
-          <label class="checkbox path">
-              <input type="checkbox" />
-              <svg viewBox="0 0 21 21">
-                  <path d="M5,10.75 L8.5,14.25 L19.4,2.3 C18.8333333,1.43333333 18.0333333,1 17,1 L4,1 C2.35,1 1,2.35 1,4 L1,17 C1,18.65 2.35,20 4,20 L17,20 C18.65,20 20,18.65 20,17 L20,7.99769186" />
-              </svg>
-          </label>
-        </div>
-        <div>
-              <input
-                  class="title"
-                  placeholder=${title}
-                  id="title"
-                  name="title" 
-              />
-              <input
-                  class="subtitle"
-                  placeholder=${subtitle}
-                  id="subtitle"
-                  name="subtitle" 
-              />
-      </div>    
-        <button type="submit" class='button'>Edit</button>
-        <button type="button" id="delete-${order}" class='button'>Delete</button>
-    </form>`;
-}
+new App(document.querySelector("#app"));
