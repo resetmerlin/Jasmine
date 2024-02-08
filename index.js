@@ -32,7 +32,6 @@ class App {
 
   render(newVDom) {
     Jasmine.patch(this.vDom, newVDom);
-    this.vDom = Jasmine.render(newVDom);
   }
 
   addEvents() {
@@ -62,12 +61,40 @@ class App {
     const newVDom = convertHTMLToCreateElement(renderedTemplate);
 
     this.render(newVDom);
+
+    this.todoLists.forEach((todoList) => {
+      const deleteButton = document.querySelector(`#delete-${todoList.order}`);
+      if (deleteButton) {
+        deleteButton.addEventListener("click", () =>
+          this.deleteTodoList(todoList.order)
+        );
+      }
+    });
   }
 
   deleteTodoList(order) {
     this.todoLists = [...this.todoLists].filter(
       (todoList) => order !== todoList.order
     );
+
+    const renderedTemplate = this.template(
+      this.todoLists
+        .map((todolist) =>
+          this.todoListView(todolist.title, todolist.subtitle, todolist.order)
+        )
+        .join("")
+    );
+
+    const newVDom = convertHTMLToCreateElement(renderedTemplate);
+
+    this.render(newVDom);
+
+    this.todoLists.forEach((todoList) => {
+      const deleteButton = document.querySelector(`#delete-${todoList.order}`);
+      deleteButton.addEventListener("click", () =>
+        this.deleteTodoList(todoList.order)
+      );
+    });
   }
 
   todoListView(title, subtitle, order) {
