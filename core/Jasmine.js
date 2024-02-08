@@ -25,11 +25,15 @@ const Jasmine = {
       }
     }
 
-    if (oldNode.childNodes.length !== renderedNewNode.childNodes.length) {
+    if (!oldNode.childNodes.length && renderedNewNode.childNodes.length) {
       oldNode.parentNode.replaceChild(renderedNewNode, oldNode);
-    } else {
-      for (let i = 0; i < oldNode.childNodes.length; i++) {
-        this.patch(oldNode.childNodes[i], newNode.children[i]);
+    } else if (newNode.children) {
+      for (let i = 0; i < newNode.children.length; i++) {
+        if (oldNode.childNodes[i] && newNode.children[i]) {
+          this.patch(oldNode.childNodes[i], newNode.children[i]);
+        } else if (!oldNode.childNodes[i] && newNode.children[i]) {
+          oldNode.appendChild(this.render(newNode.children[i]));
+        }
       }
     }
   },
