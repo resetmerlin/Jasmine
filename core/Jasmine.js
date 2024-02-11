@@ -5,9 +5,11 @@ const Jasmine = {
   },
 
   patch(oldNode, newNode) {
-    if (!newNode) return;
-
     const renderedNewNode = this.render(newNode);
+
+    if (!oldNode && newNode) {
+      oldNode.parentNode.appendChild(renderedNewNode);
+    }
 
     if (oldNode.isEqualNode(renderedNewNode)) return;
 
@@ -27,12 +29,20 @@ const Jasmine = {
 
     if (!oldNode.childNodes.length && renderedNewNode.childNodes.length) {
       oldNode.parentNode.replaceChild(renderedNewNode, oldNode);
-    } else if (newNode.children) {
-      for (let i = 0; i < newNode.children.length; i++) {
-        if (oldNode.childNodes[i] && newNode.children[i]) {
-          this.patch(oldNode.childNodes[i], newNode.children[i]);
-        } else if (!oldNode.childNodes[i] && newNode.children[i]) {
-          oldNode.appendChild(this.render(newNode.children[i]));
+    } else {
+      if (newNode.children.length) {
+        for (let i = 0; i < newNode.children.length; i++) {
+          if (oldNode.childNodes[i] && newNode.children[i]) {
+            this.patch(oldNode.childNodes[i], newNode.children[i]);
+          } else if (!oldNode.childNodes[i] && newNode.children[i]) {
+            oldNode.appendChild(this.render(newNode.children[i]));
+          }
+        }
+      } else if (!newNode.children.length) {
+        for (let i = 0; i < oldNode.childNodes.length; i++) {
+          if (oldNode.childNodes[i] && !newNode.children[i]) {
+            oldNode.childNodes[i].remove();
+          }
         }
       }
     }
