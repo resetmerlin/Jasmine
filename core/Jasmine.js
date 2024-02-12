@@ -1,8 +1,11 @@
-const Jasmine = {
+class Jasmine {
+  // Constructor is not strictly necessary for this example unless you plan to initialize instances with specific properties.
+  constructor() {}
+
   init(container, oldNode, newNode) {
     container.appendChild(oldNode);
     this.patch(oldNode, newNode);
-  },
+  }
 
   patch(oldNode, newNode) {
     const renderedNewNode = this.render(newNode);
@@ -52,14 +55,12 @@ const Jasmine = {
       !renderedNewNode.childNodes.length
     ) {
       for (let i = 0; i < oldNode.childNodes.length; i++) {
-        if (oldNode.childNodes[i] && newNode.children[i]) {
-          this.patch(oldNode.childNodes[i], newNode.children[i]);
-        } else if (oldNode.childNodes[i] && !newNode.children[i]) {
+        if (oldNode.childNodes[i] && !newNode.children[i]) {
           oldNode.removeChild(oldNode.childNodes[i]);
         }
       }
     }
-  },
+  }
 
   render(component) {
     if (!component) return;
@@ -69,7 +70,6 @@ const Jasmine = {
     }
 
     const { type, attr, children } = component;
-
     const $component = document.createElement(type);
 
     for (const [key, value] of Object.entries(attr)) {
@@ -81,7 +81,23 @@ const Jasmine = {
     });
 
     return $component;
-  },
-};
+  }
+
+  reRender(oldDom, newDom) {
+    this.patch(oldDom, newDom);
+  }
+
+  useState(initialValue) {
+    let _val = initialValue;
+
+    const state = () => _val;
+    const setState = (newVal) => {
+      _val = newVal;
+      // renderFunction();
+    };
+
+    return [state, setState];
+  }
+}
 
 export default Jasmine;
