@@ -1,4 +1,4 @@
-import { createElement } from "./CreateElement";
+import { createElement } from "../CreateElement";
 
 // Recursive function to convert a node to createElement syntax
 const convertNodeToCreateElement = (node) => {
