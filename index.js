@@ -1,8 +1,9 @@
 import Jasmine from "./core/Jasmine";
-import { convertHTMLToCreateElement } from "./src/Converter";
+import { convertHTMLToCreateElement } from "./src/Internal";
 
-class App {
+class App extends Jasmine {
   constructor(app) {
+    super();
     this.$app = app;
     this.setup();
     this.addEvents();
@@ -26,12 +27,8 @@ class App {
 
   setup() {
     const domObj = convertHTMLToCreateElement(this.template());
-    this.vDom = Jasmine.render(domObj);
-    Jasmine.init(this.$app, this.vDom, domObj);
-  }
-
-  render(newVDom) {
-    Jasmine.patch(this.vDom, newVDom);
+    this.vDom = this.render(domObj);
+    this.init(this.$app, this.vDom, domObj);
   }
 
   addEvents() {
@@ -50,7 +47,7 @@ class App {
 
     const newVDom = convertHTMLToCreateElement(renderedTemplate);
 
-    this.render(newVDom);
+    this.reRender(this.vDom, newVDom);
   }
 
   addTodoList() {
