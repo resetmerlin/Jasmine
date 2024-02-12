@@ -39,17 +39,7 @@ class App {
     $addTodoListButton.addEventListener("click", () => this.addTodoList());
   }
 
-  addTodoList() {
-    const dummyData = {
-      order: this.todoLists?.length
-        ? this.todoLists[this.todoLists.length - 1].order + 1
-        : 0,
-      title: "You can delete it",
-      subtitle: "Edit via delete button",
-    };
-
-    this.todoLists = [...this.todoLists, dummyData];
-
+  redefineDom() {
     const renderedTemplate = this.template(
       this.todoLists
         .map((todolist) =>
@@ -61,8 +51,27 @@ class App {
     const newVDom = convertHTMLToCreateElement(renderedTemplate);
 
     this.render(newVDom);
+  }
+
+  addTodoList() {
+    const dummyData = {
+      order: this.todoLists?.length
+        ? this.todoLists[this.todoLists.length - 1].order + 1
+        : 0,
+      title: "You can delete it",
+      subtitle: "Edit via delete button",
+    };
+
+    this.todoLists = [...this.todoLists, dummyData];
+
+    this.redefineDom();
 
     this.todoLists.forEach((todoList) => {
+      const form = document.querySelector(`#form-${todoList.order}`);
+      form.addEventListener("submit", (e) =>
+        this.editTodoList(e, todoList.order)
+      );
+
       const deleteButton = document.querySelector(`#delete-${todoList.order}`);
       if (deleteButton) {
         deleteButton.addEventListener("click", () =>
@@ -77,24 +86,28 @@ class App {
       (todoList) => order !== todoList.order
     );
 
-    const renderedTemplate = this.template(
-      this.todoLists
-        .map((todolist) =>
-          this.todoListView(todolist.title, todolist.subtitle, todolist.order)
-        )
-        .join("")
-    );
+    this.redefineDom();
+  }
 
-    const newVDom = convertHTMLToCreateElement(renderedTemplate);
+  editTodoList(event, order) {
+    event.preventDefault();
 
-    this.render(newVDom);
+    const data = new FormData(event.target);
+    const dataObject = Object.fromEntries(data.entries());
 
-    this.todoLists.forEach((todoList) => {
-      const deleteButton = document.querySelector(`#delete-${todoList.order}`);
-      deleteButton.addEventListener("click", () =>
-        this.deleteTodoList(todoList.order)
-      );
+    const title = dataObject.title;
+    const subtitle = dataObject.subtitle;
+
+    if (!title && !subtitle) return;
+
+    this.todoLists = this.todoLists.map((todoList) => {
+      if (todoList.order === order) {
+        return { ...todoList, title, subtitle };
+      }
+      return todoList;
     });
+
+    this.redefineDom();
   }
 
   todoListView(title, subtitle, order) {
