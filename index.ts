@@ -1,8 +1,17 @@
 import Jasmine from "./core/Jasmine";
 import { convertHTMLToCreateElement } from "./src/Internal";
 
+interface todoList {
+  title: string;
+  subtitle: string;
+  order: number;
+}
 class App extends Jasmine {
-  constructor(app) {
+  $app: Element | null;
+  todoLists: todoList[];
+  vDom: Object;
+
+  constructor(app: Element | null) {
     super();
     this.$app = app;
     this.setup();
@@ -33,13 +42,13 @@ class App extends Jasmine {
 
   addEvents() {
     const $addTodoListButton = document.querySelector("#add__button");
-    $addTodoListButton.addEventListener("click", () => this.addTodoList());
+    $addTodoListButton?.addEventListener("click", () => this.addTodoList());
   }
 
   redefineDom() {
     const renderedTemplate = this.template(
       this.todoLists
-        .map((todolist) =>
+        .map((todolist: todoList) =>
           this.todoListView(todolist.title, todolist.subtitle, todolist.order)
         )
         .join("")
@@ -65,7 +74,7 @@ class App extends Jasmine {
 
     this.todoLists.forEach((todoList) => {
       const form = document.querySelector(`#form-${todoList.order}`);
-      form.addEventListener("submit", (e) =>
+      form?.addEventListener("submit", (e) =>
         this.editTodoList(e, todoList.order)
       );
 
@@ -78,7 +87,7 @@ class App extends Jasmine {
     });
   }
 
-  deleteTodoList(order) {
+  deleteTodoList(order: number) {
     this.todoLists = [...this.todoLists].filter(
       (todoList) => order !== todoList.order
     );
@@ -86,14 +95,17 @@ class App extends Jasmine {
     this.redefineDom();
   }
 
-  editTodoList(event, order) {
+  editTodoList(event: Event, order: number) {
     event.preventDefault();
 
-    const data = new FormData(event.target);
+    const form = event.target as HTMLFormElement;
+
+    const data = new FormData(form);
+
     const dataObject = Object.fromEntries(data.entries());
 
-    const title = dataObject.title;
-    const subtitle = dataObject.subtitle;
+    const title = dataObject.title as string;
+    const subtitle = dataObject.subtitle as string;
 
     if (!title && !subtitle) return;
 
@@ -107,7 +119,7 @@ class App extends Jasmine {
     this.redefineDom();
   }
 
-  todoListView(title, subtitle, order) {
+  todoListView(title: string, subtitle: string, order: number) {
     return `
       <form id="form-${order}" class="todolist">
           <div>
