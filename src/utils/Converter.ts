@@ -6,14 +6,14 @@ import { createElement } from "./CreateElement";
  * @param {Node} node - A DOM node to convert.
  * @returns {string | object} - A string for text nodes, or an object representing the element.
  */
-const convertNodeToCreateElement = (node) => {
+const convertNodeToCreateElement = (node: Node): string | object => {
   if (node.nodeType === Node.TEXT_NODE) {
-    return node.textContent.trim();
+    return node.textContent?.trim() ?? "";
   }
 
-  const tag = node.tagName.toLowerCase();
+  const tag = (node as Element).tagName.toLowerCase();
 
-  const props = Array.from(node.attributes).reduce((acc, attr) => {
+  const props = Array.from((node as Element).attributes).reduce((acc, attr) => {
     acc[attr.name] = attr.value;
     return acc;
   }, {});
@@ -29,11 +29,18 @@ const convertNodeToCreateElement = (node) => {
  * Converts an HTML string to a format suitable for the `createElement` function by first parsing the string into a DOM structure.
  *
  * @param {string} htmlString - The HTML string to convert.
- * @returns {object} - The result of converting the first child of the parsed HTML document body.
+ * @returns {object | string} - The result of converting the first child of the parsed HTML document body.
  */
-export const convertHTMLToCreateElement = (htmlString) => {
+export const convertHTMLToCreateElement = (
+  htmlString: string
+): string | object => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlString, "text/html");
+  const firstChild = doc.body.firstChild;
 
-  return convertNodeToCreateElement(doc.body.firstChild);
+  if (!firstChild) {
+    throw new Error("HTML string did not parse correctly.");
+  }
+
+  return convertNodeToCreateElement(firstChild);
 };
