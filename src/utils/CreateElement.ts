@@ -10,7 +10,11 @@
  * @param {...any} children - Child elements or text. Can be an array of children, a single child, or even nested children.
  * @returns {Object} - An object representing a virtual DOM node.
  */
-export const createElement = (type, attr, ...children) => {
+export const createElement = (
+  type: string,
+  attr: Object,
+  ...children: any
+): object => {
   if (!attr) attr = {};
 
   return { type, attr, children };
