@@ -2,12 +2,12 @@ class Jasmine {
   // Constructor is not strictly necessary for this example unless you plan to initialize instances with specific properties.
   constructor() {}
 
-  init(container, oldNode, newNode) {
+  init(container: Element, oldNode: Node, newNode) {
     container.appendChild(oldNode);
     this.patch(oldNode, newNode);
   }
 
-  patch(oldNode, newNode) {
+  patch(oldNode: Node, newNode) {
     const renderedNewNode = this.render(newNode);
 
     if (!oldNode && newNode) {
@@ -17,7 +17,7 @@ class Jasmine {
     if (oldNode.isEqualNode(renderedNewNode)) return;
 
     if (oldNode.nodeName !== renderedNewNode.nodeName) {
-      oldNode.parentNode.replaceChild(renderedNewNode, oldNode);
+      oldNode.parentNode?.replaceChild(renderedNewNode, oldNode);
     }
 
     if (
@@ -31,7 +31,7 @@ class Jasmine {
     }
 
     if (!oldNode.childNodes.length && renderedNewNode.childNodes.length) {
-      oldNode.parentNode.replaceChild(renderedNewNode, oldNode);
+      oldNode.parentNode?.replaceChild(renderedNewNode, oldNode);
     } else if (oldNode.childNodes.length && renderedNewNode.childNodes.length) {
       if (oldNode.childNodes.length < newNode.children.length) {
         for (let i = 0; i < newNode.children.length; i++) {
@@ -83,7 +83,7 @@ class Jasmine {
     return $component;
   }
 
-  reRender(oldDom, newDom) {
+  reRender(oldDom: Node, newDom) {
     this.patch(oldDom, newDom);
   }
 
