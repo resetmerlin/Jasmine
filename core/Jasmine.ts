@@ -1,13 +1,20 @@
+interface VirtualNode {
+  attr: { class?: string };
+  children: VirtualNode["attr"][];
+  type: string;
+}
+
 class Jasmine {
   // Constructor is not strictly necessary for this example unless you plan to initialize instances with specific properties.
   constructor() {}
 
-  init(container: Element, oldNode: Node, newNode) {
+  init(container: Element, oldNode: Node, newNode: VirtualNode) {
     container.appendChild(oldNode);
     this.patch(oldNode, newNode);
   }
 
-  patch(oldNode: Node, newNode) {
+  patch(oldNode: Node, newNode: VirtualNode) {
+    console.log(newNode);
     const renderedNewNode = this.render(newNode);
 
     if (!oldNode && newNode) {
